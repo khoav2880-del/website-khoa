@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>WEBSITE CỦA KHOA 2010</title> 
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #6366f1; --secondary-color: #ec4899; --background-color: #0b0e14;
+      --card-bg: #161b22; --text: #f0f6fc; --muted: #8b949e; --gold: #e3b341;
+      --ball-color: #22c55e; --zalo-color: #0068ff; --fb-color: #1877F2; --yt-color: #ff0000;
+    }
+    body { margin: 0; font-family: 'Montserrat', sans-serif; background: var(--background-color); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; }
+
+    /* HEADER */
+    .site-header { width: 100%; padding: 20px 0; text-align: center; background: rgba(11, 14, 20, 0.98); border-bottom: 2px solid var(--primary-color); position: sticky; top: 0; z-index: 100; }
+    .site-brand { font-size: 20px; font-weight: 900; background: linear-gradient(to right, #6366f1, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase; }
+    
+    /* CHỮ CHẠY */
+    .announcement-bar { width: 100%; background: #21262d; border-bottom: 1px solid #30363d; height: 35px; overflow: hidden; display: none; align-items: center; position: relative; }
+    .announcement-bar .label { position: absolute; left: 0; top: 0; background: var(--secondary-color); color: white; padding: 0 12px; height: 100%; display: flex; align-items: center; font-size: 10px; font-weight: 800; z-index: 2; }
+    .marquee-content { display: inline-block; white-space: nowrap; padding-left: 100%; animation: marquee 15s linear infinite; color: var(--gold); font-weight: 600; font-size: 13px; }
+    @keyframes marquee { 0% { transform: translate(0, 0); } 100% { transform: translate(-100%, 0); } }
+
+    /* NÚT NỔI */
+    .floating-group { position: fixed; right: 15px; bottom: 20px; display: none; flex-direction: column; gap: 10px; z-index: 999; }
+    .f-btn { width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 2px solid #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
+    .f-btn-mail { background: var(--gold); color: #000; font-size: 20px; position: relative; }
+    .f-btn-profile { background: #000; overflow: hidden; border-color: var(--primary-color); }
+    .f-btn-profile img { width: 100%; height: 100%; object-fit: cover; }
+    .badge { position: absolute; top: -3px; right: -3px; background: red; color: white; font-size: 9px; width: 18px; height: 18px; border-radius: 50%; display: none; align-items: center; justify-content: center; border: 2px solid #fff; }
+
+    /* KHUNG CHÍNH */
+    .wrap { width: min(92vw, 400px); margin: 20px 0; padding: 25px; background: var(--card-bg); border-radius: 20px; display: none; flex-direction: column; border: 1px solid rgba(255,255,255,0.1); }
+    .field { margin-bottom: 12px; }
+    .field label { display: block; margin-bottom: 5px; font-size: 11px; color: var(--muted); }
+    .field input, .field textarea { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #333; background: #0d1117; color: white; box-sizing: border-box; font-family: inherit; outline: none; }
+
+    /* NÚT BẤM */
+    .btn { width: 100%; height: 50px; margin-bottom: 10px; border: none; border-radius: 12px; display: flex; align-items: center; padding: 0 15px; font-size: 13px; font-weight: 700; color: white; cursor: pointer; text-decoration: none; box-sizing: border-box; transition: 0.2s; }
+    .btn:active { transform: scale(0.97); }
+    .btn img { width: 22px; height: 22px; margin-right: 12px; }
+    
+    .btn-football { background: var(--ball-color); }
+    .btn-zalo { background: var(--zalo-color); }
+    .btn-fb { background: var(--fb-color); }
+    .btn-ms { background: linear-gradient(to right, #0084ff, #a033ff); }
+    .btn-yt { background: var(--yt-color); }
+    .btn-tt { background: #000; border: 1px solid #444; }
+    .btn-support { background: #00a8ff; }
+    .btn-logout { background: #21262d; margin-top: 5px; height: 40px; justify-content: center; color: var(--muted); }
+
+    /* ADMIN BOX (Trong tài khoản Admin) */
+    .admin-section { margin-top: 20px; padding-top: 20px; border-top: 2px dashed #333; display: none; flex-direction: column; }
+    .admin-label { background: #8b5cf6; color: white; padding: 5px 12px; border-radius: 6px; font-size: 10px; font-weight: 800; align-self: center; margin-bottom: 15px; }
+    .user-card { background: #0d1117; padding: 10px; border-radius: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #333; font-size: 12px; }
+
+    /* MODAL */
+    .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: none; align-items: center; justify-content: center; z-index: 1000; }
+    .modal-content { width: min(95%, 600px); background: var(--card-bg); padding: 15px; border-radius: 20px; border: 1px solid var(--primary-color); position: relative; max-height: 90vh; overflow-y: auto; }
+    .close-modal { position: absolute; right: 15px; top: 10px; font-size: 25px; cursor: pointer; color: #fff; z-index: 11; }
+  </style>
+</head>
+<body>
+
+  <header class="site-header"><div class="site-brand">WEBSITE CỦA KHOA 2010</div></header>
+
+  <div class="announcement-bar" id="notifyBar">
+    <div class="label">THÔNG BÁO</div>
+    <div class="marquee-content" id="notifyText">Chào mừng bạn!</div>
+  </div>
+
+  <div class="floating-group" id="mainFloats">
+    <div class="f-btn f-btn-mail" onclick="openInbox()">✉️ <div class="badge" id="mailBadge">0</div></div>
+    <div class="f-btn f-btn-profile" onclick="openProfile()"><img src="https://img.freepik.com/free-vector/fierce-black-red-dragon-logo-ultimate-symbol-power-dominance_689832-11862.jpg"></div>
+  </div>
+
+  <div class="modal" id="footballModal">
+    <div class="modal-content">
+      <span class="close-modal" onclick="closeModal('footballModal')">&times;</span>
+      <h3 style="text-align:center; color:var(--ball-color); margin-top:0;">⚽ KẾT QUẢ & LỊCH THI ĐẤU</h3>
+      <div id="fs-wm" style="width:100%; height:600px;">
+        <iframe src="https://www.livescore.com/en/football/live/" style="width:100%; height:100%; border:none; border-radius:10px;"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="inboxModal">
+    <div class="modal-content">
+      <span class="close-modal" onclick="closeModal('inboxModal')">&times;</span>
+      <h3 style="text-align:center; color:var(--gold);">HÒM THƯ</h3>
+      <div id="mailList"></div>
+    </div>
+  </div>
+
+  <div class="wrap" id="authBox" style="display: flex;">
+    <h3 id="authTitle" style="text-align:center;">ĐĂNG NHẬP</h3>
+    <div class="field"><label>Tên đăng nhập</label><input type="text" id="uInp" placeholder="khoalkg"></div>
+    <div id="regFields" style="display:none;">
+        <div class="field"><label>Số điện thoại</label><input type="text" id="phInp" placeholder="0824xxxxxx"></div>
+    </div>
+    <div class="field"><label>Mật khẩu</label><input type="password" id="pInp" placeholder="********"></div>
+    <button class="btn btn-zalo" style="justify-content:center;" onclick="handleAuth()">VÀO HỆ THỐNG</button>
+    <p style="text-align:center; font-size:12px; color:var(--primary-color); cursor:pointer;" onclick="toggleAuthMode()" id="toggleText">Chưa có tài khoản? Đăng ký</p>
+  </div>
+
+  <div class="wrap" id="userPanel">
+    <h4 id="welcomeTxt" style="text-align:center; margin-top:0; color:var(--gold);">XIN CHÀO</h4>
+    
+    <button class="btn btn-football" onclick="openFootball()">⚽ XEM LỊCH BÓNG ĐÁ LIVE</button>
+    <a href="https://zalo.me/g/zpkxrt124" target="_blank" class="btn btn-zalo"><img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Icon_of_Zalo.svg"> NHÓM ZALO</a>
+    <a href="https://www.facebook.com/lytieulong280810" target="_blank" class="btn btn-fb"><img src="https://upload.wikimedia.org/wikipedia/commons/b/b9/2023_Facebook_icon.svg"> FACEBOOK CỦA KHOA</a>
+    <a href="https://m.me/lytieulong280810" target="_blank" class="btn btn-ms"><img src="https://upload.wikimedia.org/wikipedia/commons/b/be/Facebook_Messenger_logo_2020.svg"> NHẮN TIN MESSENGER</a>
+    <a href="https://youtube.com/@khoalkg" target="_blank" class="btn btn-yt"><img src="https://upload.wikimedia.org/wikipedia/commons/0/09/YouTube_full-color_icon_%282017%29.svg"> KÊNH YOUTUBE</a>
+    <a href="https://www.tiktok.com/@tamthaituso1" target="_blank" class="btn btn-tt"><img src="https://static.vecteezy.com/system/resources/previews/016/716/450/non_2x/tiktok-icon-free-png.png"> XEM TIKTOK</a>
+    <a href="https://zalo.me/0824052808" target="_blank" class="btn btn-support">🎧 HỖ TRỢ KỸ THUẬT</a>
+
+    <div class="admin-section" id="adminArea">
+        <div class="admin-label">QUẢN TRỊ VIÊN</div>
+        <div class="field"><label>Nội dung chữ chạy</label>
+            <input type="text" id="admNotiInp">
+            <button onclick="saveNoti()" style="width:100%; margin-top:5px; padding:8px; background:var(--secondary-color); color:white; border:none; border-radius:8px; cursor:pointer;">Cập nhật</button>
+        </div>
+        <div class="field"><label>Gửi tin hòm thư</label>
+            <textarea id="admMailInp" rows="2"></textarea>
+            <button onclick="saveMail()" style="width:100%; margin-top:5px; padding:8px; background:var(--ball-color); color:white; border:none; border-radius:8px; cursor:pointer;">Gửi tin</button>
+        </div>
+        <h5 style="margin:10px 0 5px; font-size:11px;">THÀNH VIÊN (${usersCount()})</h5>
+        <div id="uListArea"></div>
+    </div>
+
+    <button class="btn btn-logout" onclick="location.reload()">ĐĂNG XUẤT</button>
+  </div>
+
+  <script>
+    let users = JSON.parse(localStorage.getItem('K2010_U')) || [];
+    let msgs = JSON.parse(localStorage.getItem('K2010_M')) || [];
+    let activeUser = null;
+    let isLogin = true;
+
+    function usersCount() { return users.length; }
+
+    function toggleAuthMode() {
+        isLogin = !isLogin;
+        document.getElementById('authTitle').innerText = isLogin ? "ĐĂNG NHẬP" : "ĐĂNG KÝ";
+        document.getElementById('regFields').style.display = isLogin ? "none" : "block";
+        document.getElementById('toggleText').innerText = isLogin ? "Chưa có tài khoản? Đăng ký" : "Đã có tài khoản? Đăng nhập";
+    }
+
+    function handleAuth() {
+        const u = document.getElementById('uInp').value.trim();
+        const p = document.getElementById('pInp').value.trim();
+        const ph = document.getElementById('phInp').value.trim();
+
+        if(isLogin) {
+            if(u === "khoalkg" && p === "khoa280810") {
+                activeUser = {u: "Admin Khoa", ph: "0824052808", isAdmin: true};
+                return loginDone();
+            }
+            let f = users.find(x => x.u === u && x.p === p);
+            if(f) { activeUser = f; loginDone(); } else { alert("Sai thông tin!"); }
+        } else {
+            if(!u || !p || !ph) return alert("Điền đủ thông tin!");
+            if(users.find(x => x.u === u)) return alert("Tên này đã có người dùng!");
+            users.push({u, p, ph, isAdmin: false});
+            localStorage.setItem('K2010_U', JSON.stringify(users));
+            alert("Xong! Hãy đăng nhập."); toggleAuthMode();
+        }
+    }
+
+    function loginDone() {
+        document.getElementById('authBox').style.display = 'none';
+        document.getElementById('userPanel').style.display = 'flex';
+        document.getElementById('notifyBar').style.display = 'flex';
+        document.getElementById('mainFloats').style.display = 'flex';
+        document.getElementById('welcomeTxt').innerText = "XIN CHÀO: " + activeUser.u.toUpperCase();
+        if(activeUser.isAdmin) {
+            document.getElementById('adminArea').style.display = 'flex';
+            renderUsers();
+        }
+        updateBadge();
+    }
+
+    function renderUsers() {
+        const div = document.getElementById('uListArea');
+        div.innerHTML = users.map((u, i) => `
+            <div class="user-card">
+                <div><b>${u.u}</b> - ${u.ph}</div>
+                <button onclick="delU(${i})" style="border:none; color:red; background:none; cursor:pointer;">Xóa</button>
+            </div>
+        `).join('') || "Chưa có ai.";
+    }
+
+    function delU(i) {
+        if(confirm("Xóa người này?")) { users.splice(i, 1); localStorage.setItem('K2010_U', JSON.stringify(users)); renderUsers(); }
+    }
+
+    function saveNoti() {
+        const val = document.getElementById('admNotiInp').value;
+        localStorage.setItem('K2010_N', val);
+        document.getElementById('notifyText').innerText = val;
+        alert("Đã lưu!");
+    }
+
+    function saveMail() {
+        const val = document.getElementById('admMailInp').value;
+        msgs.push({b: val, time: new Date().toLocaleString()});
+        localStorage.setItem('K2010_M', JSON.stringify(msgs));
+        alert("Đã gửi!"); updateBadge();
+    }
+
+    function updateBadge() {
+        if(msgs.length > 0) {
+            document.getElementById('mailBadge').innerText = msgs.length;
+            document.getElementById('mailBadge').style.display = 'flex';
+        }
+    }
+
+    function openInbox() {
+        document.getElementById('mailList').innerHTML = msgs.map(m => `
+            <div style="background:#0d1117; padding:10px; border-radius:10px; margin-bottom:8px; border-left:3px solid var(--gold);">
+                <p style="margin:0; font-size:12px;">${m.b}</p>
+                <small style="color:gray;">${m.time}</small>
+            </div>
+        `).reverse().join('') || "Trống.";
+        document.getElementById('inboxModal').style.display = 'flex';
+        document.getElementById('mailBadge').style.display = 'none';
+    }
+
+    function openFootball() { document.getElementById('footballModal').style.display = 'flex'; }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+    function openProfile() { alert("Tên: " + activeUser.u + "\nSĐT: " + activeUser.ph); }
+
+    // Load thông báo cũ
+    window.onload = () => {
+        const oldN = localStorage.getItem('K2010_N');
+        if(oldN) document.getElementById('notifyText').innerText = oldN;
+    };
+  </script>
+</body>
+</html>
