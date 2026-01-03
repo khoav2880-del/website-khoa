@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MB Bank Pro - Bản Full Tính Năng</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --blue-mb: #1a428a; --light-blue: #0072ff; --gray: #f4f7fa; --green: #2ecc71; --red: #ff4d4f; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Roboto', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--gray); height: 100vh; overflow: hidden; }
+        .page { position: fixed; inset: 0; background: #fff; display: none; overflow-y: auto; padding-bottom: 30px; z-index: 10; }
+        
+        /* HEADER & CARD */
+        .header { background: linear-gradient(180deg, var(--blue-mb), var(--light-blue)); padding: 60px 20px 80px; color: white; border-radius: 0 0 40px 40px; }
+        .card-balance { background: white; border-radius: 20px; padding: 20px; margin: -50px 20px 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 5; }
+        
+        /* MENU */
+        .menu-grid { padding: 10px 20px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+        .menu-item { text-align: center; cursor: pointer; }
+        .menu-icon { width: 55px; height: 55px; background: #f0f6ff; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 24px; margin: 0 auto 8px; }
+
+        /* INPUTS */
+        .input-group { background: white; margin: 12px 15px; padding: 12px 15px; border-radius: 15px; border: 1.5px solid #eee; }
+        .input-group label { font-size: 10px; color: #999; font-weight: 700; display: block; margin-bottom: 4px; text-transform: uppercase; }
+        .input-group input { width: 100%; border: none; outline: none; font-size: 16px; font-weight: 700; background: transparent; }
+
+        .btn-confirm { width: calc(100% - 30px); margin: 10px 15px; padding: 16px; background: var(--blue-mb); color: white; border: none; border-radius: 15px; font-weight: 700; cursor: pointer; }
+        .btn-mini { padding: 8px 12px; border-radius: 8px; border: none; background: var(--green); color: white; font-weight: 700; font-size: 11px; }
+
+        /* LISTS */
+        .user-card { background: #fff; padding: 15px; border-radius: 15px; border: 1px solid #eee; margin: 10px 15px; display: flex; justify-content: space-between; align-items: center; }
+        .history-item { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom: 1px solid #f5f5f5; }
+        .badge-admin { background: #fff0f0; color: var(--red); padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 700; margin-left: 5px; border: 1px solid var(--red); }
+
+        /* MODALS & BANK */
+        #bankModal { position: fixed; top: 100%; left: 0; width: 100%; height: 100%; background: white; z-index: 1000; transition: 0.4s; overflow-y: auto; }
+        .bank-item { display: flex; align-items: center; padding: 12px 20px; border-bottom: 1px solid #f5f5f5; cursor: pointer; }
+        .bank-logo { width: 35px; height: 35px; border-radius: 50%; margin-right: 15px; object-fit: contain; border: 1px solid #eee; }
+
+        /* RECEIPT */
+        #receiptPage { background: #eef7ff; text-align: center; }
+        .receipt-box { background: white; margin: 20px; padding: 30px 15px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+
+        /* SETTINGS SPECIFIC */
+        .avatar-circle { width: 70px; height: 70px; background: var(--blue-mb); color: white; border-radius: 50%; margin: 20px auto 10px; display: flex; align-items: center; justify-content: center; font-size: 30px; font-weight: 700; }
+    </style>
+</head>
+<body>
+
+    <div id="authPage" class="page" style="display: block;">
+        <div style="padding: 80px 30px; height: 100vh; display: flex; flex-direction: column; justify-content: center;">
+            <h1 style="color:var(--blue-mb); font-size: 35px; margin-bottom: 10px;">MB Bank</h1>
+            <p style="color:#888; margin-bottom: 40px;">Ngân hàng số hàng đầu Việt Nam</p>
+            <input type="text" id="l_u" style="width:100%; border:none; border-bottom:2px solid #eee; padding:15px 0; margin-bottom:20px; outline:none; font-size:16px;" placeholder="Tên đăng nhập">
+            <input type="password" id="l_p" style="width:100%; border:none; border-bottom:2px solid #eee; padding:15px 0; margin-bottom:40px; outline:none; font-size:16px;" placeholder="Mật khẩu">
+            <button class="btn-confirm" onclick="handleLogin()">ĐĂNG NHẬP</button>
+            <p style="text-align:center; color:#ccc; font-size:11px; margin-top:20px;">Admin: admin / khoa280810</p>
+        </div>
+    </div>
+
+    <div id="homePage" class="page">
+        <div class="header">
+            <h2 id="welName">Chào bạn</h2>
+            <p style="font-size:12px; opacity:0.8">STK: <span id="uStkDisp">...</span></p>
+        </div>
+        <div class="card-balance">
+            <div><p style="font-size:10px; color:#999; font-weight:700;">SỐ DƯ KHẢ DỤNG</p><p id="bal" style="font-size:24px; font-weight:700; color:var(--blue-mb)">0 VND</p></div>
+            <span style="font-size:22px;">👁️</span>
+        </div>
+        <div class="menu-grid" id="mainMenu"></div>
+        <div style="padding: 20px 20px 10px; font-weight: 700; color: #333;">Lịch sử giao dịch</div>
+        <div id="historyList"></div>
+    </div>
+
+    <div id="transPage" class="page">
+        <div style="padding:15px; border-bottom:1px solid #eee; text-align:center;"><span style="float:left; color:var(--blue-mb)" onclick="showPage('homePage')">❮</span><b>Chuyển tiền</b></div>
+        <div class="input-group" onclick="openBankModal()" style="cursor:pointer; margin-top:20px;">
+            <label>Ngân hàng thụ hưởng</label>
+            <div style="display:flex; align-items:center; padding-top:5px;">
+                <img id="v_logo" src="https://api.vietqr.io/img/MB.png" style="width:25px; margin-right:10px;">
+                <span id="v_name" style="font-weight:700;">MB Bank</span>
+            </div>
+        </div>
+        <div class="input-group"><label>Số tài khoản</label><input type="number" id="t_stk" placeholder="Nhập số tài khoản"></div>
+        <div class="input-group"><label>Họ tên người nhận</label><input type="text" id="t_n" style="text-transform:uppercase;" placeholder="TÊN NGƯỜI NHẬN"></div>
+        <div class="input-group"><label>Số tiền (VND)</label><input type="text" id="t_a" oninput="formatMoney(this)" placeholder="0"></div>
+        <div class="input-group"><label>Nội dung</label><input type="text" id="t_m" value="Chuyen khoan"></div>
+        <button class="btn-confirm" onclick="doTransfer()">TIẾP TỤC</button>
+    </div>
+
+    <div id="settingsPage" class="page">
+        <div style="padding:15px; border-bottom:1px solid #eee; text-align:center;"><span style="float:left; color:var(--blue-mb)" onclick="showPage('homePage')">❮</span><b>Cài đặt tài khoản</b></div>
+        <div class="avatar-circle" id="set_avatar">?</div>
+        <p id="set_stk_disp" style="text-align:center; font-size:12px; color:#888; margin-bottom:20px;"></p>
+        
+        <div class="input-group"><label>Họ và Tên</label><input type="text" id="s_name"></div>
+        <div class="input-group"><label>Số điện thoại</label><input type="number" id="s_phone"></div>
+        <div style="padding:10px 15px; font-size:11px; color:#999; font-weight:700;">ĐỔI MẬT KHẨU (Để trống nếu không đổi)</div>
+        <div class="input-group"><label>Mật khẩu hiện tại</label><input type="password" id="s_old_pass"></div>
+        <div class="input-group"><label>Mật khẩu mới</label><input type="password" id="s_new_pass"></div>
+        
+        <button class="btn-confirm" onclick="saveSettings()">LƯU THÔNG TIN</button>
+        <button onclick="location.reload()" style="width:calc(100% - 30px); margin:10px 15px; padding:15px; background:transparent; border:1px solid var(--red); color:var(--red); border-radius:15px; font-weight:700;">ĐĂNG XUẤT</button>
+    </div>
+
+    <div id="adminPage" class="page">
+        <div style="padding:15px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; background:#fff; z-index:100;">
+            <b>Quản lý tài khoản</b><span onclick="showPage('homePage')" style="color:var(--blue-mb); font-weight:700;">XONG</span>
+        </div>
+        <div style="padding:15px;">
+            <input type="text" id="userSearch" style="width:100%; padding:12px; border:1px solid #ddd; border-radius:10px; outline:none;" placeholder="Tìm theo STK..." oninput="renderAdminUsers()">
+        </div>
+        <div id="adminUserList"></div>
+    </div>
+
+    <div id="receiptPage" class="page">
+        <div style="padding-top:60px;">
+            <div style="width:60px; height:60px; background:#0072ff; color:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 15px; font-size:30px;">✓</div>
+            <h3>Giao dịch thành công</h3>
+            <h1 id="r_amount" style="color:var(--blue-mb); font-size:32px; margin:10px 0;">0 VND</h1>
+            <p id="r_date" style="color:#888; font-size:13px;"></p>
+        </div>
+        <div class="receipt-box">
+            <h4 id="r_name" style="text-transform:uppercase;">...</h4>
+            <p id="r_stk" style="font-weight:700; margin:5px 0;">...</p>
+            <p id="r_bank" style="font-size:14px; color:#666;"></p>
+            <p id="r_msg" style="border-top:1px solid #eee; margin-top:15px; padding-top:10px; font-size:14px; color:#888;"></p>
+        </div>
+        <button class="btn-confirm" onclick="showPage('homePage')">VỀ TRANG CHỦ</button>
+    </div>
+
+    <div id="bankModal">
+        <div style="padding:15px; border-bottom:1px solid #eee; position:sticky; top:0; background:#fff; display:flex; justify-content:space-between; align-items:center; z-index:10;">
+            <b>Chọn ngân hàng</b><span onclick="closeBankModal()" style="color:var(--blue-mb); font-weight:700;">ĐÓNG</span>
+        </div>
+        <div style="padding:10px;"><input type="text" id="bankSearch" style="width:100%; padding:10px; border-radius:8px; border:1px solid #eee;" placeholder="Tìm ngân hàng..." oninput="filterBanks(this.value)"></div>
+        <div id="bankList"></div>
+    </div>
+
+    <script>
+        let db = JSON.parse(localStorage.getItem('mb_pro_db')) || [
+            {user:'admin', pass:'khoa280810', fullName:'QUẢN TRỊ VIÊN', stk:'88888888', phone:'0999999999', balance:100000000, history:[], role:'admin'}
+        ];
+        let curU = null;
+        let allBanks = [];
+
+        async function fetchBanks() {
+            try {
+                const res = await fetch('https://api.vietqr.io/v2/banks');
+                const data = await res.json();
+                allBanks = data.data;
+                renderBanks(allBanks);
+            } catch (e) { console.error("Lỗi API ngân hàng"); }
+        }
+        fetchBanks();
+
+        function handleLogin() {
+            const u = document.getElementById('l_u').value.trim().toLowerCase();
+            const p = document.getElementById('l_p').value;
+            let user = db.find(x => x.user === u && x.pass === p);
+
+            if (!user) {
+                if(u === 'admin') return alert("Sai mật khẩu Admin");
+                user = { user:u, pass:p, fullName:u.toUpperCase(), stk: Math.floor(100000000 + Math.random()*900000000).toString(), phone: '09'+Math.floor(10000000+Math.random()*90000000), balance: 0, history: [], role: 'user' };
+                db.push(user);
+                saveDB();
+            }
+            curU = user;
+            renderMenu();
+            updateUI();
+            showPage('homePage');
+        }
+
+        function renderMenu() {
+            const menu = document.getElementById('mainMenu');
+            let html = `
+                <div class="menu-item" onclick="showPage('transPage')"><div class="menu-icon">💸</div><p style="font-size:11px">Chuyển tiền</p></div>
+                <div class="menu-item" onclick="openSettings()"><div class="menu-icon" style="background:#6c5ce7; color:white">⚙️</div><p style="font-size:11px">Cài đặt</p></div>
+            `;
+            if(curU.role === 'admin') html += `<div class="menu-item" onclick="showPage('adminPage'); renderAdminUsers();"><div class="menu-icon" style="background:var(--red); color:white">🛡️</div><p style="font-size:11px">Quản lý</p></div>`;
+            html += `<div class="menu-item" onclick="location.reload()"><div class="menu-icon" style="color:var(--red)">🚪</div><p style="font-size:11px">Đăng xuất</p></div>`;
+            menu.innerHTML = html;
+        }
+
+        function updateUI() {
+            document.getElementById('welName').innerText = "Chào, " + curU.fullName;
+            document.getElementById('uStkDisp').innerText = curU.stk;
+            document.getElementById('bal').innerText = curU.balance.toLocaleString() + " VND";
+            const hList = document.getElementById('historyList');
+            hList.innerHTML = curU.history.length ? curU.history.map(h => `
+                <div class="history-item">
+                    <div><b>${h.title}</b><br><small style="color:#999">${h.time}</small></div>
+                    <div style="font-weight:700; color:${h.type==='in'?'var(--green)':'var(--red)'}">${h.type==='in'?'+':'-'}${h.amount.toLocaleString()}đ</div>
+                </div>
+            `).join('') : '<p style="text-align:center; padding:30px; font-size:12px; color:#999;">Chưa có giao dịch</p>';
+        }
+
+        // --- PHẦN CÀI ĐẶT ---
+        function openSettings() {
+            document.getElementById('s_name').value = curU.fullName;
+            document.getElementById('s_phone').value = curU.phone;
+            document.getElementById('set_avatar').innerText = curU.fullName.charAt(0);
+            document.getElementById('set_stk_disp').innerText = "Số tài khoản: " + curU.stk;
+            document.getElementById('s_old_pass').value = "";
+            document.getElementById('s_new_pass').value = "";
+            showPage('settingsPage');
+        }
+
+        function saveSettings() {
+            const newName = document.getElementById('s_name').value.trim();
+            const newPhone = document.getElementById('s_phone').value.trim();
+            const oldP = document.getElementById('s_old_pass').value;
+            const newP = document.getElementById('s_new_pass').value;
+
+            if(!newName || !newPhone) return alert("Vui lòng nhập đủ tên và SĐT");
+
+            if(newP !== "") {
+                if(oldP !== curU.pass) return alert("Mật khẩu cũ không đúng");
+                curU.pass = newP;
+            }
+
+            curU.fullName = newName.toUpperCase();
+            curU.phone = newPhone;
+            saveDB();
+            updateUI();
+            alert("Đã cập nhật thành công!");
+            showPage('homePage');
+        }
+
+        // --- PHẦN ADMIN ---
+        function renderAdminUsers() {
+            const list = document.getElementById('adminUserList');
+            const key = document.getElementById('userSearch').value.trim();
+            const filtered = db.filter(u => u.stk.includes(key));
+            list.innerHTML = filtered.map(u => `
+                <div class="user-card" style="${u.role === 'admin' ? 'border-left:4px solid var(--red)' : ''}">
+                    <div style="font-size:13px;">
+                        <b>${u.fullName}</b> ${u.role==='admin'?'<span class="badge-admin">ADMIN</span>':''}<br>
+                        STK: <span style="color:var(--blue-mb); font-weight:700;">${u.stk}</span><br>
+                        Số dư: <span style="color:var(--green); font-weight:700;">${u.balance.toLocaleString()}đ</span>
+                    </div>
+                    <button class="btn-mini" onclick="adminDeposit('${u.stk}')">NẠP TIỀN</button>
+                </div>
+            `).join('');
+        }
+
+        function adminDeposit(stk) {
+            let u = db.find(x => x.stk === stk);
+            let val = prompt("Nạp tiền cho " + u.fullName + ":", "1000000");
+            if(val) {
+                let amt = parseInt(val.replace(/\D/g,''));
+                u.balance += amt;
+                u.history.unshift({type:'in', title:'Nạp tiền từ hệ thống', amount:amt, time:getNow()});
+                saveDB(); renderAdminUsers();
+                if(curU.stk === stk) updateUI();
+                alert("Nạp thành công!");
+            }
+        }
+
+        // --- NGÂN HÀNG & CHUYỂN TIỀN ---
+        function renderBanks(l) { document.getElementById('bankList').innerHTML = l.map(b => `<div class="bank-item" onclick="selectBank('${b.shortName}', '${b.logo}')"><img src="${b.logo}" class="bank-logo"><div><b>${b.shortName}</b><br><small style="color:#999">${b.name}</small></div></div>`).join(''); }
+        function filterBanks(v) { renderBanks(allBanks.filter(b => b.shortName.toLowerCase().includes(v.toLowerCase()) || b.name.toLowerCase().includes(v.toLowerCase()))); }
+        function selectBank(n, l) { document.getElementById('v_name').innerText = n; document.getElementById('v_logo').src = l; closeBankModal(); }
+        function openBankModal() { document.getElementById('bankModal').style.top = '0'; }
+        function closeBankModal() { document.getElementById('bankModal').style.top = '100%'; }
+
+        function doTransfer() {
+            let amt = parseInt(document.getElementById('t_a').value.replace(/\D/g,'')) || 0;
+            if(amt <= 0 || curU.balance < amt) return alert("Số dư không đủ!");
+            curU.balance -= amt;
+            curU.history.unshift({type:'out', title:'Chuyển tiền đến ' + document.getElementById('t_n').value, amount:amt, time:getNow()});
+            document.getElementById('r_amount').innerText = amt.toLocaleString() + " VND";
+            document.getElementById('r_name').innerText = document.getElementById('t_n').value;
+            document.getElementById('r_stk').innerText = document.getElementById('t_stk').value;
+            document.getElementById('r_bank').innerText = document.getElementById('v_name').innerText;
+            document.getElementById('r_msg').innerText = document.getElementById('t_m').value;
+            document.getElementById('r_date').innerText = getNow() + " " + new Date().getFullYear();
+            saveDB(); updateUI(); showPage('receiptPage');
+        }
+
+        function saveDB() { localStorage.setItem('mb_pro_db', JSON.stringify(db)); }
+        function getNow() { let d = new Date(); return d.getHours().toString().padStart(2,'0')+":"+d.getMinutes().toString().padStart(2,'0')+" "+d.getDate()+"/"+(d.getMonth()+1); }
+        function formatMoney(el) { let v = el.value.replace(/\D/g,''); el.value = v ? Number(v).toLocaleString() : ''; }
+        function showPage(id) { document.querySelectorAll('.page').forEach(p => p.style.display='none'); document.getElementById(id).style.display='block'; }
+    </script>
+</body>
+</html>
